@@ -1,7 +1,5 @@
 package algorithm;
-
 import java.util.Scanner;
-
 public class Cheese {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
@@ -29,9 +27,7 @@ public class Cheese {
             A[i][j] = 1;
         }
         System.out.println(getCheese(A, N));
-        
     }
-
     private static int getCheese(int[][] a, int n) {
         int sum = 0;
         for (int i = 1; i < n + 1; i++) {
