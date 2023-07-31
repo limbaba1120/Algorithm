@@ -2,8 +2,12 @@ package ch6;
 
 import java.util.Scanner;
 
+<<<<<<< HEAD
 public class n2941
 {
+=======
+public class n2941 {
+>>>>>>> 305e5e63400f096e628a58d64af9c73f95e87406
     public static void main(String[] args) {
 
         Scanner in = new Scanner(System.in);
