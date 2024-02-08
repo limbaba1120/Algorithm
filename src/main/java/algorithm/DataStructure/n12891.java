@@ -1,12 +1,5 @@
 package algorithm.DataStructure;
 
-<<<<<<< HEAD
-import java.util.Scanner;
-
-public class n12891 {
-    public static void main(String[] args) {
-        Scanner scan = new Scanner(System.in);
-=======
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -51,8 +44,6 @@ public class n12891 {
             Result = getResult(Result);
         }
         System.out.println(Result);
-
->>>>>>> 34bb1b345fe89b5988f6b0bb94360da9db9af246
 
     }
 
