@@ -3,24 +3,26 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
-        double arr[] = new double[scan.nextInt()];
+        int n = scan.nextInt();
+        int A[] = new int[n];
+        double sum = 0;
+        double max = 0;
 
-        double avg = 0;
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = scan.nextDouble();
+        for (int i = 0; i < n; i++) {
+            A[i] = scan.nextInt();
         }
-        double max = arr[0];
-        for (int i = 1; i < arr.length; i++)
-            if (arr[i] > max)
-                max = arr[i];
 
-        for (int i = 0; i < arr.length; i++)
-            arr[i] = arr[i]/max * 100;
+        for (int i = 0; i < n; i++) {
+            if (max < A[i]) {
+                max = A[i];
+            }
+        }
 
-        for (int i = 0; i < arr.length; i++)
-            avg += arr[i];
+        for (int i = 0; i < n; i++) {
+            sum += (A[i] / max) * 100.0;
+        }
+        System.out.println(sum/n);
 
-        System.out.println(avg/arr.length);
 
     }
 }
