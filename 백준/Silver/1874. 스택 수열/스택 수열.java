@@ -5,30 +5,35 @@ import java.util.Stack;
 public class Main {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
-        StringBuilder sb = new StringBuilder();
-
         int N = scan.nextInt();
-
-        Stack<Integer> st = new Stack<>();
-
-        int start = 0;
-
-        while (N-- > 0) {
-            int value = scan.nextInt();
-
-            if (value > start) {
-                for (int i = start + 1; i <= value; i++) {
-                    st.push(i);
-                    sb.append('+').append('\n');
-                }
-                start = value;
-            } else if (st.peek() != value) {
-                System.out.println("NO");
-                return;
-            }
-            st.pop();
-            sb.append('-').append('\n');
+        int[] A = new int[N];
+        for (int i = 0; i < N; i++) {
+            A[i] = scan.nextInt();
         }
-        System.out.println(sb);
+        Stack<Integer> stack = new Stack<>();
+        StringBuilder sb = new StringBuilder();
+        int num = 1;
+        boolean result = true;
+        for (int i = 0; i < A.length; i++) {
+            int su = A[i];
+            if (su >= num) {
+                while (su >= num) {
+                    stack.push(num++);
+                    sb.append("+\n");
+                }
+                stack.pop();
+                sb.append("-\n");
+            } else {
+                int n = stack.pop();
+                if (n > su) {
+                    System.out.println("NO");
+                    result = false;
+                    break;
+                } else {
+                    sb.append("-\n");
+                }
+            }
+        }
+        if (result) System.out.println(sb.toString());
     }
 }
