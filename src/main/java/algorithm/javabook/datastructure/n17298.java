@@ -1,8 +1,6 @@
 package algorithm.javabook.datastructure;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Stack;
 
 public class n17298 {
@@ -27,8 +25,11 @@ public class n17298 {
         while (!myStack.isEmpty()) {
             Ans[myStack.pop()] = -1;
         }
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         for (int i = 0; i < n; i++) {
-            System.out.print(Ans[i] + " ");
+            bw.write(Ans[i] + " ");
         }
+        bw.write("\n");
+        bw.flush();
     }
 }
