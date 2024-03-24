@@ -18,6 +18,7 @@ public class n11286 {
                 return first_abs - second_abs;
             }
         });
+       
 
         for (int i = 0; i < N; i++) {
             int request = Integer.parseInt(br.readLine());
@@ -32,5 +33,8 @@ public class n11286 {
             }
 
         }
+
+
     }
+
 }
