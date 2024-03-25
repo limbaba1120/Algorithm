@@ -15,7 +15,7 @@ public class Num {
         hashMap.put("C", 3);
 
         for (Entry<String, Integer> entry : hashMap.entrySet()) {
-
+            System.out.println();
         }
     }
 }
