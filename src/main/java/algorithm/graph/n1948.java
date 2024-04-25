@@ -67,7 +67,7 @@ public class n1948 {
             }
         }
         System.out.println(result[endDosi]);
-        System.out.println(resultCount);
+//        System.out.println(resultCount);
 
     }
 
