@@ -16,6 +16,11 @@ public class n1043 {
         int T = scan.nextInt();
         result = 0;
         trueP = new int[T];
+<<<<<<< HEAD
+        for (int i = 0; i < T; i++) {
+            trueP[i] = scan.nextInt();
+        }
+=======
         party = new ArrayList[M];
 
         for (int i = 0; i < T; i++) {
@@ -71,5 +76,6 @@ public class n1043 {
         } else {
             return parent[a] = find(parent[a]);
         }
+>>>>>>> 21f858adb9486bdf6a8d9da0572b952141a47678
     }
 }
