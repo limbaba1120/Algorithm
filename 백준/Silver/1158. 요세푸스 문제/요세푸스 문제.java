@@ -1,35 +1,40 @@
-
-import java.util.LinkedList;
-import java.util.Queue;
+import java.sql.SQLOutput;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+
 
 public class Main {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
 
-   
-    public static void main(String[] args) {
-        Scanner scan = new Scanner(System.in);
-        StringBuilder sb = new StringBuilder();
+		int N = scan.nextInt();
+		int K = scan.nextInt();
 
-        int N = scan.nextInt();
-        int K = scan.nextInt();
+		ArrayList<Integer> list = new ArrayList<>();
 
-        Queue<Integer> que = new LinkedList<>();
+		for (int i = 1; i <= N; i++) {
+			list.add(i);
+		}
+		int[] ans = new int[N];
+		int currentIndex = 0;
 
-        for (int i = 1; i <= N; i++) {
-            que.offer(i);
-        }
+		for (int i = 0; i < N; i++) {
+			currentIndex = (currentIndex + K - 1) % list.size();
+			ans[i] = list.remove(currentIndex);
+		}
 
-        sb.append("<");
+		System.out.print("<");
+		for (int i = 0; i < N; i++) {
+			if (i == N - 1) {
+				System.out.print(ans[i]);
+				continue;
+			}
+			System.out.print(ans[i] + ", ");
+		}
+		System.out.println(">");
 
-        while (que.size() != 1) {
-            for (int i = 0; i < K - 1; i++) {
-                que.offer(que.poll());
-            }
-            sb.append(que.poll()).append(", ");
-        }
-        // 마지막 값
-        sb.append(que.poll()).append(">");
-        System.out.println(sb);
-
-    }
+		//System.out.println("<" + Arrays.stream(ans).mapToObj(String::valueOf).collect(Collectors.joining(", ")) + ">");
+	}
 }
