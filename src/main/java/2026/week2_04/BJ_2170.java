@@ -71,7 +71,7 @@ public class BJ_2170 {
         }
 
         result += end - start; 
-        bw.write(result);
+        bw.write(String.valueOf(result));
 
         bw.flush();
         bw.close();
