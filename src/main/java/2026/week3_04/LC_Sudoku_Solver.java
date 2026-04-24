@@ -53,7 +53,7 @@ class Main {
             for (int j = 0; j < 9; j++) {
                 sb.append(board[i][j]);
 
-                if ( j == 2 || i == 5 ) sb.append("|");
+                if ( j == 2 || j == 5 ) sb.append("|");
                 else if ( j < 8) sb.append(" ");
             }
             System.out.println(sb.toString());
