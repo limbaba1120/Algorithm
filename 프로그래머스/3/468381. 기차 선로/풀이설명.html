@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="프로그래머스 기차 선로 문제의 Java 백트래킹 풀이 설명">
+  <title>기차 선로 | Java 풀이 설명</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #172033;
+      --muted: #637083;
+      --line: #dce3ed;
+      --primary: #2563eb;
+      --primary-soft: #eaf1ff;
+      --green: #15803d;
+      --green-soft: #ecfdf3;
+      --orange: #b45309;
+      --orange-soft: #fff7ed;
+      --red: #b42318;
+      --red-soft: #fff1f0;
+      --code: #111827;
+      --code-text: #e5edf8;
+      --shadow: 0 16px 44px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif;
+      line-height: 1.75;
+      word-break: keep-all;
+    }
+
+    a { color: inherit; }
+
+    .hero {
+      color: #fff;
+      background:
+        radial-gradient(circle at 82% 10%, rgba(96, 165, 250, .36), transparent 28rem),
+        linear-gradient(130deg, #172554 0%, #1d4ed8 62%, #2563eb 100%);
+      padding: 76px 24px 66px;
+    }
+
+    .hero-inner, .layout { max-width: 1180px; margin: 0 auto; }
+    .eyebrow { margin: 0 0 12px; color: #bfdbfe; font-weight: 800; letter-spacing: .08em; }
+    h1 { margin: 0; font-size: clamp(2.35rem, 7vw, 4.5rem); line-height: 1.08; letter-spacing: -.045em; }
+    .hero p { max-width: 760px; margin: 22px 0 0; color: #dbeafe; font-size: 1.1rem; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 26px; }
+    .tag { padding: 7px 12px; border: 1px solid rgba(255,255,255,.26); border-radius: 999px; background: rgba(255,255,255,.1); font-size: .9rem; font-weight: 700; }
+
+    .layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 28px; padding: 34px 24px 72px; align-items: start; }
+
+    nav {
+      position: sticky;
+      top: 20px;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    nav strong { display: block; margin: 0 8px 10px; }
+    nav a { display: block; padding: 8px; border-radius: 9px; color: var(--muted); text-decoration: none; font-size: .92rem; }
+    nav a:hover { color: var(--primary); background: var(--primary-soft); }
+
+    main { min-width: 0; }
+    section { scroll-margin-top: 24px; margin-bottom: 24px; padding: clamp(22px, 4vw, 38px); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+    h2 { margin: 0 0 18px; font-size: clamp(1.45rem, 3vw, 2rem); letter-spacing: -.025em; }
+    h3 { margin: 30px 0 10px; font-size: 1.15rem; }
+    p { margin: 10px 0; }
+    ul, ol { padding-left: 1.4rem; }
+    li + li { margin-top: 6px; }
+    code:not(pre code) { padding: 2px 6px; color: #1e40af; border-radius: 6px; background: #eef2ff; font-family: "SFMono-Regular", Consolas, monospace; }
+
+    .lead { color: var(--muted); font-size: 1.05rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 20px 0; }
+    .card { padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-soft); }
+    .card h3 { margin-top: 0; }
+    .number { display: inline-grid; width: 32px; height: 32px; margin-right: 8px; place-items: center; color: #fff; border-radius: 50%; background: var(--primary); font-weight: 800; }
+
+    .callout { margin: 18px 0; padding: 16px 18px; border-left: 5px solid var(--primary); border-radius: 10px; background: var(--primary-soft); }
+    .callout.good { border-color: var(--green); background: var(--green-soft); }
+    .callout.warn { border-color: var(--orange); background: var(--orange-soft); }
+    .callout.bad { border-color: var(--red); background: var(--red-soft); }
+    .callout strong { display: block; margin-bottom: 3px; }
+
+    .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 22px 0; }
+    .flow span { padding: 10px 14px; border: 1px solid #bfd2ff; border-radius: 10px; background: var(--primary-soft); font-weight: 750; }
+    .flow b { color: var(--primary); font-size: 1.25rem; }
+
+    .diagram { overflow-x: auto; margin: 16px 0; padding: 18px; border: 1px dashed #a9b7ca; border-radius: 12px; background: #f8fafc; color: #344054; font: 700 1rem/1.55 "SFMono-Regular", Consolas, monospace; white-space: pre; }
+
+    .bit-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+    .bit-table th, .bit-table td { padding: 12px; border: 1px solid var(--line); text-align: center; }
+    .bit-table th { background: #eef4ff; }
+    .bit { font-family: "SFMono-Regular", Consolas, monospace; font-weight: 800; letter-spacing: .08em; }
+
+    .code-wrap { position: relative; margin: 18px 0; }
+    .code-title { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; color: #cbd5e1; border-bottom: 1px solid #334155; border-radius: 13px 13px 0 0; background: #1e293b; font: 700 .85rem "SFMono-Regular", Consolas, monospace; }
+    .copy { cursor: pointer; padding: 5px 9px; color: #dbeafe; border: 1px solid #475569; border-radius: 7px; background: #334155; font: inherit; }
+    .copy:hover { background: #475569; }
+    pre { overflow: auto; margin: 0; padding: 20px; color: var(--code-text); border-radius: 0 0 13px 13px; background: var(--code); font: .88rem/1.65 "SFMono-Regular", Consolas, monospace; tab-size: 4; }
+    .kw { color: #c084fc; } .type { color: #67e8f9; } .str { color: #86efac; } .cm { color: #94a3b8; } .num { color: #fbbf24; }
+
+    .method { display: grid; grid-template-columns: 150px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .method:last-child { border: 0; }
+    .method strong { color: var(--primary); font-family: "SFMono-Regular", Consolas, monospace; }
+
+    .step { margin: 24px 0; padding: 22px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface-soft); }
+    .step-head { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+    .step-head b { flex: 0 0 auto; display: grid; width: 35px; height: 35px; place-items: center; color: #fff; border-radius: 10px; background: var(--primary); }
+    .step-head h3 { margin: 1px 0 0; }
+    .step .code-wrap { margin-bottom: 12px; }
+    .read-code { margin: 12px 0 0; padding: 14px 16px; border-radius: 10px; background: #fff; border: 1px solid var(--line); }
+    .read-code strong { color: var(--primary); }
+
+    footer { padding: 26px; color: var(--muted); text-align: center; }
+
+    @media (max-width: 840px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { position: static; }
+      nav .links { display: flex; overflow-x: auto; }
+      nav a { white-space: nowrap; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .hero { padding: 52px 20px 46px; }
+      .layout { padding: 20px 12px 50px; }
+      section { padding: 22px 17px; }
+      .method { grid-template-columns: 1fr; gap: 2px; }
+      pre { font-size: .78rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">PROGRAMMERS · 2025 KAKAO</p>
+      <h1>기차 선로</h1>
+      <p>빈칸에 선로를 배치하는 백트래킹부터 연결 가지치기, 기차 시뮬레이션까지 Java 코드와 함께 단계별로 이해합니다.</p>
+      <div class="tags">
+        <span class="tag">Level 3</span><span class="tag">백트래킹</span><span class="tag">비트마스크</span><span class="tag">시뮬레이션</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav aria-label="문서 목차">
+      <strong>목차</strong>
+      <div class="links">
+        <a href="#summary">1. 문제 요약</a>
+        <a href="#strategy">2. 전체 전략</a>
+        <a href="#mask">3. 선로 표현</a>
+        <a href="#direction">4. 방향 확인</a>
+        <a href="#dfs">5. 백트래킹</a>
+        <a href="#place">6. 배치 검사</a>
+        <a href="#simulation">7. 기차 이동</a>
+        <a href="#walkthrough">8. 코드 조립하기</a>
+        <a href="#code">9. 전체 코드</a>
+        <a href="#summary-last">10. 최종 정리</a>
+      </div>
+    </nav>
+
+    <main>
+      <section id="summary">
+        <h2>1. 문제를 간단히 요약하면</h2>
+        <p class="lead">빈칸에 선로를 적절히 놓아서, 출발한 기차가 목적지까지 모든 선로를 지나도록 만드는 배치의 수를 구하는 문제입니다.</p>
+        <div class="grid-2">
+          <div class="card"><h3>격자의 값</h3><ul><li><code>0</code>: 빈칸</li><li><code>-1</code>: 장애물</li><li><code>1~7</code>: 이미 놓인 선로</li></ul></div>
+          <div class="card"><h3>빈칸의 선택</h3><ul><li>선로를 놓지 않는다.</li><li>1~7번 선로 중 하나를 놓는다.</li></ul></div>
+        </div>
+        <h3>정답이 되기 위한 조건</h3>
+        <ol><li>이웃한 선로의 연결 방향이 맞아야 합니다.</li><li>기차가 오른쪽 아래 목적지에 도착해야 합니다.</li><li>격자에 놓인 모든 선로를 한 번 이상 지나야 합니다.</li><li>3번 십자 선로는 상하좌우 모두 연결되어야 합니다.</li></ol>
+        <div class="callout warn"><strong>중요한 구분</strong>선로끼리 연결되는 것과 기차가 모든 선로를 실제로 지나는 것은 서로 다른 조건입니다.</div>
+      </section>
+
+      <section id="strategy">
+        <h2>2. 전체 풀이 전략</h2>
+        <div class="grid-2">
+          <div class="card"><h3><span class="number">1</span>선로 배치</h3><p>백트래킹으로 빈칸마다 빈칸 또는 1~7번 선로를 시도합니다.</p></div>
+          <div class="card"><h3><span class="number">2</span>기차 이동</h3><p>모든 칸을 정했다면 기차를 직접 움직여 최종 조건을 검사합니다.</p></div>
+        </div>
+        <div class="flow"><span>선로 선택</span><b>→</b><span>연결 검사</span><b>→</b><span>다음 칸</span><b>→</b><span>기차 시뮬레이션</span></div>
+        <h3>실제 함수 호출 순서</h3>
+        <div class="diagram">solution(grid)
+   │
+   ├─ 입력을 original과 board에 저장
+   │
+   └─ dfs(0)
+        │
+        ├─ 빈칸: canPlace()로 0~7번 선택 검사
+        │          └─ 가능하면 dfs(index + 1)
+        │
+        ├─ 장애물·고정 선로: 바로 dfs(index + 1)
+        │
+        └─ index == n × m
+             └─ canTravelAllTracks()
+                  ├─ 기차를 목적지까지 이동
+                  └─ 모든 선로 방문 여부 확인</div>
+        <p>빈칸 하나에는 8가지 선택이 있지만, 잘못된 연결을 발견하는 즉시 탐색을 중단합니다. 전체 격자가 최대 20칸이므로 이 가지치기가 적용된 백트래킹을 사용할 수 있습니다.</p>
+        <div class="diagram">위쪽 선로
+    │
+
+현재 선로 ──   ← 연결이 끊겼으므로 남은 칸을 볼 필요가 없음</div>
+      </section>
+
+      <section id="mask">
+        <h2>3. 선로를 하나의 숫자로 표현하기</h2>
+        <p>선로 하나에는 위·오른쪽·아래·왼쪽의 연결 정보가 필요합니다. 네 방향을 네 개의 전등 스위치라고 생각해 봅시다.</p>
+        <table class="bit-table"><thead><tr><th>방향</th><th>방향 번호</th><th>비트값</th><th>2진수</th></tr></thead><tbody><tr><td>위</td><td>0</td><td>1</td><td class="bit">0001</td></tr><tr><td>오른쪽</td><td>1</td><td>2</td><td class="bit">0010</td></tr><tr><td>아래</td><td>2</td><td>4</td><td class="bit">0100</td></tr><tr><td>왼쪽</td><td>3</td><td>8</td><td class="bit">1000</td></tr></tbody></table>
+        <p>가로 선로는 오른쪽과 왼쪽 스위치가 켜져 있으므로 <code>0010 | 1000 = 1010</code>입니다. 이렇게 여러 상태를 한 정수에 저장하는 방법을 비트마스크라고 합니다.</p>
+        <div class="code-wrap"><div class="code-title">선로 비트마스크 <button class="copy">복사</button></div><pre><code><span class="kw">private static final int</span> UP = <span class="num">1</span>;
+<span class="kw">private static final int</span> RIGHT = <span class="num">2</span>;
+<span class="kw">private static final int</span> DOWN = <span class="num">4</span>;
+<span class="kw">private static final int</span> LEFT = <span class="num">8</span>;
+
+<span class="kw">private static final int</span>[] TYPE = {
+    <span class="num">0</span>,                              <span class="cm">// 빈칸</span>
+    RIGHT | LEFT,                   <span class="cm">// 1번: 가로</span>
+    UP | DOWN,                      <span class="cm">// 2번: 세로</span>
+    UP | RIGHT | DOWN | LEFT,       <span class="cm">// 3번: 십자</span>
+    UP | LEFT,                      <span class="cm">// 4번</span>
+    UP | RIGHT,                     <span class="cm">// 5번</span>
+    RIGHT | DOWN,                   <span class="cm">// 6번</span>
+    DOWN | LEFT                     <span class="cm">// 7번</span>
+};</code></pre></div>
+      </section>
+
+      <section id="direction">
+        <h2>4. 특정 방향이 열려 있는지 확인하기</h2>
+        <p><code>hasDirection(mask, direction)</code>은 “이 선로가 해당 방향으로 연결되어 있는가?”만 답하는 함수입니다.</p>
+        <div class="diagram">가로 선로      1010
+오른쪽 확인값  0010
+AND 결과       0010  → 0이 아니므로 오른쪽으로 연결됨</div>
+        <div class="diagram">가로 선로      1010
+위쪽 확인값    0001
+AND 결과       0000  → 0이므로 위쪽으로 연결되지 않음</div>
+        <div class="code-wrap"><div class="code-title">hasDirection() <button class="copy">복사</button></div><pre><code><span class="kw">private boolean</span> hasDirection(<span class="type">int</span> mask, <span class="type">int</span> direction) {
+    <span class="cm">// 1 &lt;&lt; direction으로 검사할 방향의 비트를 만든다.</span>
+    <span class="type">int</span> directionBit = <span class="num">1</span> &lt;&lt; direction;
+
+    <span class="cm">// 결과가 0이 아니면 그 방향의 스위치가 켜져 있다.</span>
+    <span class="kw">return</span> (mask &amp; directionBit) != <span class="num">0</span>;
+}</code></pre></div>
+        <div class="callout"><strong>읽는 방법</strong><code>(mask &amp; (1 &lt;&lt; direction)) != 0</code>은 “네 방향 스위치 중 확인할 방향의 스위치가 켜져 있는가?”라는 뜻입니다.</div>
+      </section>
+
+      <section id="dfs">
+        <h2>5. 백트래킹으로 선로 배치하기</h2>
+        <p><code>dfs(index)</code>는 index번째 칸부터 가능한 선로를 놓고, 완성할 수 있는 정답 배치 수를 반환합니다.</p>
+        <div class="diagram">현재 빈칸
+ ├─ 빈칸 유지
+ ├─ 1번 선로
+ ├─ 2번 선로
+ ├─ ...
+ └─ 7번 선로</div>
+        <div class="callout good"><strong>가지치기</strong>선로를 하나 선택할 때마다 <code>canPlace()</code>를 호출합니다. 주변과 연결될 수 없는 선택은 다음 칸으로 진행하지 않습니다.</div>
+        <div class="code-wrap"><div class="code-title">dfs()의 핵심 <button class="copy">복사</button></div><pre><code><span class="kw">private int</span> dfs(<span class="type">int</span> index) {
+    <span class="cm">// 모든 칸을 정했다면 기차를 실제로 움직인다.</span>
+    <span class="kw">if</span> (index == n * m) {
+        <span class="kw">return</span> canTravelAllTracks() ? <span class="num">1</span> : <span class="num">0</span>;
+    }
+
+    <span class="type">int</span> r = index / m;
+    <span class="type">int</span> c = index % m;
+
+    <span class="cm">// 장애물과 고정 선로는 그대로 지나간다.</span>
+    <span class="kw">if</span> (original[r][c] != <span class="num">0</span>) {
+        <span class="kw">return</span> dfs(index + <span class="num">1</span>);
+    }
+
+    <span class="type">int</span> count = <span class="num">0</span>;
+
+    <span class="kw">for</span> (<span class="type">int</span> type = <span class="num">0</span>; type &lt;= <span class="num">7</span>; type++) {
+        <span class="type">int</span> mask = TYPE[type];
+
+        <span class="kw">if</span> (!canPlace(r, c, mask)) {
+            <span class="kw">continue</span>; <span class="cm">// 불가능한 선택 제거</span>
+        }
+
+        board[r][c] = mask;
+        count += dfs(index + <span class="num">1</span>);
+    }
+
+    board[r][c] = <span class="num">0</span>; <span class="cm">// 되돌리기</span>
+    <span class="kw">return</span> count;
+}</code></pre></div>
+        <div class="callout warn"><strong>고정 선로의 예외</strong>출발점의 1번 선로는 왼쪽 연결이 격자 밖을 향합니다. 따라서 처음부터 주어진 고정 선로에는 새 선로용 경계 검사를 적용하지 않고 그대로 지나갑니다.</div>
+      </section>
+
+      <section id="place">
+        <h2>6. 현재 선로를 놓을 수 있는지 검사하기</h2>
+        <p>이웃한 두 칸은 서로 마주 보는 방향의 연결 여부가 같아야 합니다.</p>
+        <div class="diagram">현재 칸의 오른쪽 O  ↔ 오른쪽 칸의 왼쪽 O : 정상
+현재 칸의 오른쪽 O  ↔ 오른쪽 칸의 왼쪽 X : 실패
+현재 칸의 오른쪽 X  ↔ 오른쪽 칸의 왼쪽 O : 실패
+현재 칸의 오른쪽 X  ↔ 오른쪽 칸의 왼쪽 X : 정상</div>
+        <p>반대 방향은 <code>(d + 2) % 4</code>로 구합니다. 위(0)와 아래(2), 오른쪽(1)과 왼쪽(3)이 서로 반대입니다.</p>
+        <h3><code>canPlace()</code>의 검사 순서</h3>
+        <ol><li>현재 선로가 격자 밖을 향하는가?</li><li>현재 선로가 장애물을 향하는가?</li><li>이미 결정된 위쪽·왼쪽 칸과 연결이 맞는가?</li><li>처음부터 주어진 고정 선로와 연결이 맞는가?</li></ol>
+        <div class="code-wrap"><div class="code-title">canPlace()의 핵심 비교 <button class="copy">복사</button></div><pre><code><span class="type">boolean</span> currentConnected = hasDirection(mask, d);
+<span class="type">int</span> opposite = (d + <span class="num">2</span>) % <span class="num">4</span>;
+<span class="type">boolean</span> neighborConnected =
+    hasDirection(neighborMask, opposite);
+
+<span class="cm">// 한쪽만 열려 있으면 연결이 끊긴다.</span>
+<span class="kw">if</span> (currentConnected != neighborConnected) {
+    <span class="kw">return false</span>;
+}</code></pre></div>
+      </section>
+
+      <section id="simulation">
+        <h2>7. 기차를 직접 움직여 보기</h2>
+        <p>연결 검사만 통과했다고 정답은 아닙니다. 목적지까지 가지 않는 별도 선로가 있을 수 있기 때문입니다.</p>
+        <div class="diagram">출발 ───── 목적지
+
+       ┌──┐
+       └──┘   ← 기차가 지나지 않는 별도 선로</div>
+        <h3>기차의 상태</h3>
+        <p>기차의 상태는 <code>(행, 열, 진행 방향)</code>입니다. 같은 십자 칸도 가로로 통과할 때와 세로로 통과할 때가 다르므로 방향까지 방문 상태에 포함합니다.</p>
+        <div class="code-wrap"><div class="code-title">방향까지 기록하는 방문 배열 <button class="copy">복사</button></div><pre><code><span class="type">boolean</span>[][] visitedCell = <span class="kw">new boolean</span>[n][m];
+<span class="type">boolean</span>[][][] visitedState = <span class="kw">new boolean</span>[n][m][<span class="num">4</span>];</code></pre></div>
+        <h3>다음 방향 결정</h3>
+        <div class="grid-2"><div class="card"><h3>일반 선로</h3><div class="diagram">기차 → ┐
+       ↓</div><p>들어온 면을 제외한 나머지 연결 방향으로 나갑니다.</p></div><div class="card"><h3>십자 선로</h3><div class="diagram">→ ┼ →
+
+  ↓
+  ┼
+  ↓</div><p>현재 진행 방향을 그대로 유지해 직진합니다.</p></div></div>
+        <div class="callout bad"><strong>무한 순환 판별</strong>같은 칸에 같은 방향으로 다시 도착하면 이후 움직임도 완전히 같으므로 실패입니다.</div>
+      </section>
+
+      <section id="walkthrough">
+        <h2>8. 코드를 처음부터 하나씩 조립하기</h2>
+        <p class="lead">이 절만 순서대로 읽어도 전체 코드가 왜 필요한지 이해할 수 있도록, 선언부터 반환까지 빠짐없이 조립합니다.</p>
+        <div class="callout"><strong>먼저 전체 순서를 기억하세요</strong>상수와 배열 준비 → 입력 변환 → DFS로 선로 선택 → 배치 가능 여부 검사 → 완성된 배치에서 기차 이동 → 성공한 배치 수 반환</div>
+
+        <div class="step">
+          <div class="step-head"><b>1</b><h3>방향을 정의한다</h3></div>
+          <p>먼저 프로그램에서 위·오른쪽·아래·왼쪽을 표현할 숫자가 필요합니다.</p>
+          <div class="code-wrap"><div class="code-title">1단계 코드 <button class="copy">복사</button></div><pre><code><span class="kw">private static final int</span> UP = <span class="num">1</span>;
+<span class="kw">private static final int</span> RIGHT = <span class="num">2</span>;
+<span class="kw">private static final int</span> DOWN = <span class="num">4</span>;
+<span class="kw">private static final int</span> LEFT = <span class="num">8</span>;
+
+<span class="kw">private static final int</span>[] DR = {-<span class="num">1</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">0</span>};
+<span class="kw">private static final int</span>[] DC = {<span class="num">0</span>, <span class="num">1</span>, <span class="num">0</span>, -<span class="num">1</span>};</code></pre></div>
+          <div class="read-code"><strong>코드를 말로 읽으면:</strong> “연결 상태에는 1, 2, 4, 8을 사용하고, 이동 방향 번호는 0=위, 1=오른쪽, 2=아래, 3=왼쪽으로 사용한다.”</div>
+          <ul>
+            <li><code>UP, RIGHT, DOWN, LEFT</code>는 선로가 열린 방향을 저장할 때 사용합니다.</li>
+            <li><code>DR, DC</code>는 기차나 이웃 좌표를 실제로 한 칸 이동할 때 사용합니다.</li>
+            <li>방향 번호의 순서를 두 배열에서 똑같이 유지해야 합니다.</li>
+          </ul>
+        </div>
+
+        <div class="step">
+          <div class="step-head"><b>2</b><h3>선로 번호를 연결 방향으로 바꾼다</h3></div>
+          <p>문제에서는 선로를 1~7번으로 주지만, 프로그램에서는 어느 방향으로 연결되는지가 더 중요합니다.</p>
+          <div class="code-wrap"><div class="code-title">2단계 코드 <button class="copy">복사</button></div><pre><code><span class="kw">private static final int</span>[] TYPE = {
+    <span class="num">0</span>,
+    RIGHT | LEFT,              <span class="cm">// 1번: 오른쪽 + 왼쪽</span>
+    UP | DOWN,                 <span class="cm">// 2번: 위 + 아래</span>
+    UP | RIGHT | DOWN | LEFT,  <span class="cm">// 3번: 모든 방향</span>
+    UP | LEFT,
+    UP | RIGHT,
+    RIGHT | DOWN,
+    DOWN | LEFT
+};</code></pre></div>
+          <div class="read-code"><strong>예시:</strong> <code>TYPE[1]</code>은 가로 선로입니다. 값은 <code>RIGHT | LEFT</code>, 즉 오른쪽과 왼쪽으로 연결되었다는 뜻입니다.</div>
+          <div class="diagram">TYPE[1] = RIGHT | LEFT = 0010 | 1000 = 1010
+TYPE[2] = UP | DOWN    = 0001 | 0100 = 0101
+TYPE[3] = 네 방향 모두 = 1111</div>
+          <p><code>TYPE[0] = 0</code>도 중요합니다. DFS의 <code>type = 0</code> 선택은 “이 빈칸에 아무 선로도 놓지 않는다”는 의미입니다.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-head"><b>3</b><h3>멤버 변수와 입력 격자를 준비한다</h3></div>
+          <p><code>original</code>은 원래 입력을 보관하고, <code>board</code>에는 실제 탐색 중인 비트마스크 선로를 저장합니다.</p>
+          <div class="code-wrap"><div class="code-title">3단계 코드: solution() 전체 시작 과정 <button class="copy">복사</button></div><pre><code><span class="kw">private int</span> n;
+<span class="kw">private int</span> m;
+<span class="kw">private int</span>[][] original;
+<span class="kw">private int</span>[][] board;
+
+<span class="kw">public int</span> solution(<span class="type">int</span>[][] grid) {
+    n = grid.length;
+    m = grid[<span class="num">0</span>].length;
+
+    original = <span class="kw">new int</span>[n][m];
+    board = <span class="kw">new int</span>[n][m];
+
+    <span class="kw">for</span> (<span class="type">int</span> r = <span class="num">0</span>; r &lt; n; r++) {
+        <span class="kw">for</span> (<span class="type">int</span> c = <span class="num">0</span>; c &lt; m; c++) {
+            original[r][c] = grid[r][c];
+
+            <span class="kw">if</span> (grid[r][c] == -<span class="num">1</span>) {
+                board[r][c] = -<span class="num">1</span>; <span class="cm">// 장애물</span>
+            } <span class="kw">else if</span> (grid[r][c] &gt; <span class="num">0</span>) {
+                board[r][c] = TYPE[grid[r][c]]; <span class="cm">// 고정 선로</span>
+            }
+            <span class="cm">// 원래 빈칸이면 int 배열 기본값 0이 그대로 남는다.</span>
+        }
+    }
+
+    <span class="kw">return</span> dfs(<span class="num">0</span>); <span class="cm">// 0번 칸부터 탐색 시작</span>
+}</code></pre></div>
+          <div class="read-code"><strong>왜 배열이 두 개일까?</strong> <code>original</code>을 보면 원래 빈칸인지 고정 선로인지 알 수 있고, <code>board</code>를 보면 현재 어떤 선로를 선택했는지 알 수 있습니다.</div>
+          <ul>
+            <li><code>original[r][c] == 0</code>: DFS가 선택해야 하는 원래 빈칸입니다.</li>
+            <li><code>original[r][c] == -1</code>: 바꿀 수 없는 장애물입니다.</li>
+            <li><code>original[r][c] &gt; 0</code>: 바꿀 수 없는 고정 선로입니다.</li>
+            <li><code>board</code>의 양수는 선로 번호가 아니라 변환된 방향 비트마스크입니다.</li>
+          </ul>
+        </div>
+
+        <div class="step">
+          <div class="step-head"><b>4</b><h3>DFS가 한 칸씩 이동하게 만든다</h3></div>
+          <p>아직 선로 선택은 하지 않고, 먼저 격자를 순서대로 방문하는 뼈대를 만듭니다.</p>
+          <div class="code-wrap"><div class="code-title">4단계 코드 <button class="copy">복사</button></div><pre><code><span class="kw">private int</span> dfs(<span class="type">int</span> index) {
+    <span class="kw">if</span> (index == n * m) {
+        <span class="kw">return</span> canTravelAllTracks() ? <span class="num">1</span> : <span class="num">0</span>;
+    }
+
+    <span class="type">int</span> r = index / m;
+    <span class="type">int</span> c = index % m;
+
+    <span class="kw">if</span> (original[r][c] != <span class="num">0</span>) {
+        <span class="kw">return</span> dfs(index + <span class="num">1</span>);
+    }
+
+    <span class="cm">// 다음 단계에서 빈칸 선택 코드를 넣는다.</span>
+}</code></pre></div>
+          <div class="read-code"><strong>코드를 말로 읽으면:</strong> “현재 번호를 행과 열로 바꾸고, 장애물이나 고정 선로라면 건드리지 말고 다음 칸으로 간다. 모든 칸을 봤다면 기차를 움직인다.”</div>
+          <div class="callout"><strong>왜 <code>index == n * m</code>일까?</strong><code>n * m</code>은 전체 칸 수입니다. 칸 번호는 <code>0</code>부터 <code>n*m-1</code>까지이므로, index가 <code>n*m</code>이 되었다면 모든 칸을 처리한 것입니다.</div>
+          <div class="diagram">n = 2, m = 3일 때
+
+index  0  1  2
+       3  4  5
+
+dfs(6)에 도착 → 6 == n × m → 0~5번 칸을 모두 처리함</div>
+          <p><code>canTravelAllTracks() ? 1 : 0</code>은 완성된 현재 배치가 정답이면 1개, 아니면 0개라는 뜻입니다.</p>
+          <div class="callout warn"><strong>왜 고정 선로는 canPlace()를 호출하지 않을까?</strong>출발점의 1번 선로는 모양상 왼쪽도 열려 있지만, 기차는 오른쪽으로 출발하므로 왼쪽의 격자 밖 연결을 허용해야 합니다. 고정 선로는 그대로 두고 최종 시뮬레이션에서 실제 경로를 검사합니다.</div>
+        </div>
+
+        <div class="step">
+          <div class="step-head"><b>5</b><h3>빈칸에서 8가지 선택을 시도한다</h3></div>
+          <p>원래 빈칸인 곳에서는 빈칸 유지와 1~7번 선로를 하나씩 선택합니다.</p>
+          <div class="code-wrap"><div class="code-title">5단계 코드 <button class="copy">복사</button></div><pre><code><span class="type">int</span> count = <span class="num">0</span>;
+
+<span class="kw">for</span> (<span class="type">int</span> type = <span class="num">0</span>; type &lt;= <span class="num">7</span>; type++) {
+    <span class="type">int</span> mask = TYPE[type];
+
+    <span class="kw">if</span> (!canPlace(r, c, mask)) {
+        <span class="kw">continue</span>;
+    }
+
+    board[r][c] = mask;          <span class="cm">// 선택하기</span>
+    count += dfs(index + <span class="num">1</span>); <span class="cm">// 다음 칸</span>
+}
+
+board[r][c] = <span class="num">0</span>;             <span class="cm">// 되돌리기</span>
+<span class="kw">return</span> count;</code></pre></div>
+          <div class="read-code"><strong>핵심:</strong> 선택 → 다음 칸 탐색 → 되돌리기의 반복입니다. <code>canPlace()</code>가 false라면 그 선택은 더 진행하지 않습니다.</div>
+          <h3>반환값이 더해지는 과정</h3>
+          <div class="diagram">현재 빈칸에서
+type 0 선택의 정답 수 = 2
+type 1 선택의 정답 수 = 0
+type 2 선택의 정답 수 = 3
+나머지 선택의 정답 수 = 0
+
+count = 2 + 0 + 3 + 0 ... = 5</div>
+          <p>즉, <code>count += dfs(index + 1)</code>은 현재 선택에서 만들어지는 모든 정답 수를 합치는 코드입니다. 함수 끝의 <code>board[r][c] = 0</code>은 부모 DFS로 돌아가기 전에 현재 선택을 지우는 되돌리기입니다.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-head"><b>6</b><h3>현재 선로와 이웃 선로를 비교한다</h3></div>
+          <p>현재 선로가 오른쪽으로 열려 있다면 오른쪽 이웃은 왼쪽으로 열려 있어야 합니다.</p>
+          <div class="code-wrap"><div class="code-title">6단계 코드: canPlace() 전체 흐름 <button class="copy">복사</button></div><pre><code><span class="kw">private boolean</span> canPlace(<span class="type">int</span> r, <span class="type">int</span> c, <span class="type">int</span> mask) {
+    <span class="kw">for</span> (<span class="type">int</span> d = <span class="num">0</span>; d &lt; <span class="num">4</span>; d++) {
+        <span class="type">boolean</span> currentConnected = hasDirection(mask, d);
+        <span class="type">int</span> nr = r + DR[d];
+        <span class="type">int</span> nc = c + DC[d];
+
+        <span class="cm">// ① 격자 밖으로 선로가 나가면 실패</span>
+        <span class="kw">if</span> (!isInside(nr, nc)) {
+            <span class="kw">if</span> (currentConnected) <span class="kw">return false</span>;
+            <span class="kw">continue</span>;
+        }
+
+        <span class="cm">// ② 장애물 쪽으로 선로가 나가면 실패</span>
+        <span class="kw">if</span> (original[nr][nc] == -<span class="num">1</span>) {
+            <span class="kw">if</span> (currentConnected) <span class="kw">return false</span>;
+            <span class="kw">continue</span>;
+        }
+
+        <span class="cm">// ③ 위·왼쪽은 이미 처리한 칸</span>
+        <span class="type">boolean</span> alreadyDecided =
+            nr &lt; r || (nr == r &amp;&amp; nc &lt; c);
+
+        <span class="cm">// ④ 입력에 있던 고정 선로는 모양을 이미 알고 있음</span>
+        <span class="type">boolean</span> fixedTrack = original[nr][nc] &gt; <span class="num">0</span>;
+
+        <span class="kw">if</span> (alreadyDecided || fixedTrack) {
+            <span class="type">int</span> neighborMask = fixedTrack
+                ? TYPE[original[nr][nc]]
+                : board[nr][nc];
+
+            <span class="type">int</span> opposite = (d + <span class="num">2</span>) % <span class="num">4</span>;
+            <span class="type">boolean</span> neighborConnected =
+                hasDirection(neighborMask, opposite);
+
+            <span class="cm">// ⑤ 한쪽만 열려 있으면 실패</span>
+            <span class="kw">if</span> (currentConnected != neighborConnected) {
+                <span class="kw">return false</span>;
+            }
+        }
+    }
+
+    <span class="kw">return true</span>;
+}</code></pre></div>
+          <div class="read-code"><strong>예시:</strong> 현재 선로의 오른쪽이 열려 있다면 오른쪽 칸의 왼쪽도 열려 있어야 합니다. 현재만 열렸거나 이웃만 열렸다면 <code>false</code>를 반환합니다.</div>
+          <div class="callout"><strong>왜 오른쪽·아래쪽 빈칸은 바로 비교하지 않을까?</strong>아직 어떤 선로가 놓일지 정하지 않았기 때문입니다. 나중에 그 칸을 처리할 때 현재 칸과 연결을 검사합니다.</div>
+          <h3><code>canPlace()</code>가 true/false를 반환하는 예</h3>
+          <div class="diagram">예 1) 현재 ─ 장애물
+현재 선로가 오른쪽으로 열림 + 오른쪽이 장애물 → false
+
+예 2) 왼쪽 선로 ─ 현재 선로
+왼쪽 선로의 오른쪽 O + 현재 선로의 왼쪽 O → 계속 검사
+
+예 3) 왼쪽 선로 ─   현재 선로 │
+왼쪽 선로의 오른쪽 O + 현재 선로의 왼쪽 X → false
+
+네 방향을 모두 통과 → true</div>
+          <p><code>return true</code>는 현재 배치가 최종 정답이라는 뜻이 아닙니다. 지금까지 확인 가능한 주변 연결에 모순이 없다는 뜻일 뿐입니다.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-head"><b>7</b><h3>기차의 다음 방향을 찾는다</h3></div>
+          <p>기차가 현재 칸에 들어온 면을 구한 뒤, 일반 선로에서는 다른 연결 방향으로 나갑니다.</p>
+          <div class="code-wrap"><div class="code-title">7단계 코드: 이동 준비와 반복 검사 <button class="copy">복사</button></div><pre><code><span class="type">boolean</span>[][] visitedCell = <span class="kw">new boolean</span>[n][m];
+<span class="type">boolean</span>[][][] visitedState = <span class="kw">new boolean</span>[n][m][<span class="num">4</span>];
+
+<span class="type">int</span> r = <span class="num">0</span>;
+<span class="type">int</span> c = <span class="num">0</span>;
+<span class="type">int</span> direction = <span class="num">1</span>; <span class="cm">// 오른쪽으로 출발</span>
+
+<span class="kw">while</span> (<span class="kw">true</span>) {
+    <span class="cm">// 격자 밖 또는 선로가 없는 곳이면 실패</span>
+    <span class="kw">if</span> (!isInside(r, c) || board[r][c] &lt;= <span class="num">0</span>) {
+        <span class="kw">return false</span>;
+    }
+
+    <span class="cm">// 같은 칸에 같은 방향으로 다시 오면 무한 반복</span>
+    <span class="kw">if</span> (visitedState[r][c][direction]) {
+        <span class="kw">return false</span>;
+    }
+
+    visitedState[r][c][direction] = <span class="kw">true</span>;
+    visitedCell[r][c] = <span class="kw">true</span>;
+
+    <span class="cm">// 목적지에 도착하면 이동 반복을 끝냄</span>
+    <span class="kw">if</span> (r == n - <span class="num">1</span> &amp;&amp; c == m - <span class="num">1</span>) {
+        <span class="kw">break</span>;
+    }</code></pre></div>
+          <div class="read-code"><strong>방문 배열이 두 개인 이유:</strong> <code>visitedCell</code>은 모든 선로를 지났는지 확인하고, <code>visitedState</code>는 같은 위치·방향이 반복되는 무한 순환을 찾습니다.</div>
+          <ul>
+            <li><code>visitedCell[r][c]</code>: 이 칸을 한 번이라도 지났는가?</li>
+            <li><code>visitedState[r][c][direction]</code>: 이 칸에 같은 진행 방향으로 들어온 적이 있는가?</li>
+            <li>십자 선로는 같은 칸을 가로와 세로로 각각 지날 수 있으므로 방향까지 기록해야 합니다.</li>
+          </ul>
+
+          <div class="code-wrap"><div class="code-title">7단계 코드: 다음 방향을 찾아 한 칸 이동 <button class="copy">복사</button></div><pre><code>    <span class="type">int</span> mask = board[r][c];
+    <span class="type">int</span> enteredSide = (direction + <span class="num">2</span>) % <span class="num">4</span>;
+    <span class="type">int</span> nextDirection = -<span class="num">1</span>;
+
+    <span class="kw">if</span> (!hasDirection(mask, enteredSide)) {
+        <span class="kw">return false</span>;
+    }
+
+    <span class="kw">if</span> (mask == TYPE[<span class="num">3</span>]) {
+        nextDirection = direction; <span class="cm">// 십자 선로는 직진</span>
+    } <span class="kw">else</span> {
+        <span class="kw">for</span> (<span class="type">int</span> d = <span class="num">0</span>; d &lt; <span class="num">4</span>; d++) {
+            <span class="kw">if</span> (d != enteredSide &amp;&amp; hasDirection(mask, d)) {
+                nextDirection = d;
+                <span class="kw">break</span>;
+            }
+        }
+    }
+
+    <span class="kw">if</span> (nextDirection == -<span class="num">1</span>) {
+        <span class="kw">return false</span>;
+    }
+
+    r += DR[nextDirection];
+    c += DC[nextDirection];
+    direction = nextDirection;
+}</code></pre></div>
+          <div class="read-code"><strong>예시:</strong> 오른쪽으로 움직여 왔다면 현재 칸의 왼쪽 면으로 들어온 것입니다. 일반 선로에서는 왼쪽을 제외한 다른 연결 방향으로 나가고, 십자 선로에서는 그대로 오른쪽으로 직진합니다.</div>
+          <div class="diagram">direction = 오른쪽(1)
+enteredSide = (1 + 2) % 4 = 왼쪽(3)
+
+현재 선로가 왼쪽 + 아래로 연결됨
+→ 왼쪽은 들어온 면이므로 제외
+→ 아래쪽이 nextDirection
+→ r += 1, c += 0으로 아래 칸 이동</div>
+          <p><code>nextDirection == -1</code>이면 나갈 연결 방향을 찾지 못한 것이므로 실패합니다. 방향을 찾았다면 <code>DR</code>, <code>DC</code>로 한 칸 이동하고 반복문 처음으로 돌아갑니다.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-head"><b>8</b><h3>목적지 도착 후 모든 선로 방문을 확인한다</h3></div>
+          <p>목적지에 도착했어도 사용하지 않은 선로가 하나라도 있으면 정답이 아닙니다.</p>
+          <div class="code-wrap"><div class="code-title">8단계 코드 <button class="copy">복사</button></div><pre><code><span class="kw">for</span> (<span class="type">int</span> r = <span class="num">0</span>; r &lt; n; r++) {
+    <span class="kw">for</span> (<span class="type">int</span> c = <span class="num">0</span>; c &lt; m; c++) {
+        <span class="kw">if</span> (board[r][c] &gt; <span class="num">0</span> &amp;&amp; !visitedCell[r][c]) {
+            <span class="kw">return false</span>;
+        }
+    }
+}
+
+<span class="kw">return true</span>;</code></pre></div>
+          <div class="read-code"><strong>최종 성공:</strong> 목적지에 도착했고, 놓인 모든 선로의 <code>visitedCell</code>이 true일 때만 한 가지 정답 배치로 셉니다.</div>
+          <div class="callout warn"><strong>목적지 도착만으로는 부족합니다</strong>기차가 목적지에 도착해도 다른 위치에 방문하지 않은 선로가 있으면 <code>false</code>입니다. 목적지 도착 후 이중 반복문을 실행하는 이유입니다.</div>
+        </div>
+
+        <div class="step">
+          <div class="step-head"><b>9</b><h3>도우미 함수 두 개를 사용한다</h3></div>
+          <p>여러 곳에서 반복하는 방향 확인과 격자 범위 확인을 작은 함수로 분리합니다.</p>
+          <div class="code-wrap"><div class="code-title">9단계 코드 <button class="copy">복사</button></div><pre><code><span class="kw">private boolean</span> hasDirection(<span class="type">int</span> mask, <span class="type">int</span> direction) {
+    <span class="type">int</span> directionBit = <span class="num">1</span> &lt;&lt; direction;
+    <span class="kw">return</span> (mask &amp; directionBit) != <span class="num">0</span>;
+}
+
+<span class="kw">private boolean</span> isInside(<span class="type">int</span> r, <span class="type">int</span> c) {
+    <span class="kw">return</span> <span class="num">0</span> &lt;= r &amp;&amp; r &lt; n &amp;&amp; <span class="num">0</span> &lt;= c &amp;&amp; c &lt; m;
+}</code></pre></div>
+          <div class="read-code"><strong>역할:</strong> <code>hasDirection()</code>은 선로의 특정 방향이 열렸는지, <code>isInside()</code>는 좌표가 격자 안인지 알려줍니다.</div>
+        </div>
+
+        <div class="step">
+          <div class="step-head"><b>10</b><h3>작은 예제로 전체 호출 흐름을 따라간다</h3></div>
+          <p>아래는 정확한 정답 개수를 계산하려는 예가 아니라, 함수들이 어떤 순서로 호출되는지 보여주는 예입니다.</p>
+          <div class="diagram">입력
+[1, 0]
+[0, 2]
+
+① solution()
+   1번과 2번 고정 선로를 비트마스크로 변환
+   dfs(0) 호출
+
+② dfs(0)
+   (0,0)은 고정 선로 → dfs(1)
+
+③ dfs(1)
+   (0,1)은 빈칸 → type 0~7을 차례대로 시도
+   각 선택마다 canPlace(0,1,mask) 호출
+
+④ 선택 하나가 가능하면 dfs(2)
+   (1,0)도 빈칸 → 다시 type 0~7 시도
+
+⑤ dfs(3)
+   (1,1)은 고정 선로 → dfs(4)
+
+⑥ dfs(4)
+   4 == n × m → 모든 칸 결정 완료
+   canTravelAllTracks() 호출
+
+⑦ 시뮬레이션 결과
+   성공 → 1 반환
+   실패 → 0 반환
+
+⑧ 이전 DFS로 돌아가 다음 선로 모양을 계속 시도
+   모든 반환값을 count에 합산</div>
+          <div class="read-code"><strong>전체를 한 문장으로:</strong> <code>solution()</code>이 준비하고, <code>dfs()</code>가 배치를 만들고, <code>canPlace()</code>가 불가능한 배치를 줄이고, <code>canTravelAllTracks()</code>가 완성된 배치를 최종 판정합니다.</div>
+        </div>
+
+        <div class="callout good"><strong>이제 전체 코드를 읽는 순서</strong><code>solution()</code>으로 준비하고 → <code>dfs()</code>로 선로를 놓고 → <code>canPlace()</code>로 가지치기하고 → <code>canTravelAllTracks()</code>로 정답을 확인합니다.</div>
+      </section>
+
+      <section id="code">
+        <h2>9. 전체 Java 코드</h2>
+        <p class="lead">코드는 실행되는 역할별로 나누어 읽으면 쉽습니다.</p>
+        <div class="method"><strong>solution()</strong><span>입력을 탐색에 사용할 형태로 준비하고 DFS를 시작합니다.</span></div>
+        <div class="method"><strong>dfs()</strong><span>빈칸에 가능한 선로를 놓아 전체 배치를 만듭니다.</span></div>
+        <div class="method"><strong>canPlace()</strong><span>현재 선로가 주변과 연결될 수 있는지 검사합니다.</span></div>
+        <div class="method"><strong>canTravelAllTracks()</strong><span>완성된 배치에서 기차를 직접 움직입니다.</span></div>
+        <div class="method"><strong>도우미 함수</strong><span>방향 연결 여부와 격자 범위를 확인합니다.</span></div>
+        <div class="code-wrap"><div class="code-title">Solution.java <button class="copy">전체 코드 복사</button></div><pre><code>class Solution {
+    private static final int UP = 1;
+    private static final int RIGHT = 2;
+    private static final int DOWN = 4;
+    private static final int LEFT = 8;
+
+    // 0=위, 1=오른쪽, 2=아래, 3=왼쪽
+    private static final int[] DR = {-1, 0, 1, 0};
+    private static final int[] DC = {0, 1, 0, -1};
+
+    private static final int[] TYPE = {
+        0,
+        RIGHT | LEFT,
+        UP | DOWN,
+        UP | RIGHT | DOWN | LEFT,
+        UP | LEFT,
+        UP | RIGHT,
+        RIGHT | DOWN,
+        DOWN | LEFT
+    };
+
+    private int n;
+    private int m;
+    private int[][] original;
+    private int[][] board;
+
+    public int solution(int[][] grid) {
+        n = grid.length;
+        m = grid[0].length;
+        original = new int[n][m];
+        board = new int[n][m];
+
+        for (int r = 0; r &lt; n; r++) {
+            for (int c = 0; c &lt; m; c++) {
+                original[r][c] = grid[r][c];
+
+                if (grid[r][c] == -1) {
+                    board[r][c] = -1;
+                } else if (grid[r][c] &gt; 0) {
+                    board[r][c] = TYPE[grid[r][c]];
+                }
+            }
+        }
+
+        return dfs(0);
+    }
+
+    private int dfs(int index) {
+        if (index == n * m) {
+            return canTravelAllTracks() ? 1 : 0;
+        }
+
+        int r = index / m;
+        int c = index % m;
+
+        // 장애물과 처음부터 주어진 선로는 그대로 지나간다.
+        if (original[r][c] != 0) {
+            return dfs(index + 1);
+        }
+
+        int count = 0;
+
+        // 빈칸 또는 1~7번 선로를 하나씩 시도한다.
+        for (int type = 0; type &lt;= 7; type++) {
+            int mask = TYPE[type];
+
+            if (!canPlace(r, c, mask)) {
+                continue;
+            }
+
+            board[r][c] = mask;
+            count += dfs(index + 1);
+        }
+
+        board[r][c] = 0;
+        return count;
+    }
+
+    private boolean canPlace(int r, int c, int mask) {
+        for (int d = 0; d &lt; 4; d++) {
+            boolean currentConnected = hasDirection(mask, d);
+            int nr = r + DR[d];
+            int nc = c + DC[d];
+
+            if (!isInside(nr, nc)) {
+                if (currentConnected) return false;
+                continue;
+            }
+
+            if (original[nr][nc] == -1) {
+                if (currentConnected) return false;
+                continue;
+            }
+
+            boolean alreadyDecided = nr &lt; r || (nr == r &amp;&amp; nc &lt; c);
+            boolean fixedTrack = original[nr][nc] &gt; 0;
+
+            if (alreadyDecided || fixedTrack) {
+                int neighborMask = fixedTrack
+                    ? TYPE[original[nr][nc]]
+                    : board[nr][nc];
+
+                int opposite = (d + 2) % 4;
+                boolean neighborConnected =
+                    hasDirection(neighborMask, opposite);
+
+                if (currentConnected != neighborConnected) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private boolean canTravelAllTracks() {
+        boolean[][] visitedCell = new boolean[n][m];
+        boolean[][][] visitedState = new boolean[n][m][4];
+
+        int r = 0;
+        int c = 0;
+        int direction = 1; // 오른쪽으로 출발
+
+        while (true) {
+            if (!isInside(r, c) || board[r][c] &lt;= 0) {
+                return false;
+            }
+
+            if (visitedState[r][c][direction]) {
+                return false;
+            }
+
+            visitedState[r][c][direction] = true;
+            visitedCell[r][c] = true;
+
+            if (r == n - 1 &amp;&amp; c == m - 1) {
+                break;
+            }
+
+            int mask = board[r][c];
+            int enteredSide = (direction + 2) % 4;
+
+            if (!hasDirection(mask, enteredSide)) {
+                return false;
+            }
+
+            int nextDirection = -1;
+
+            if (mask == TYPE[3]) {
+                // 십자 선로에서는 직진한다.
+                nextDirection = direction;
+            } else {
+                // 들어온 면이 아닌 다른 연결 방향으로 나간다.
+                for (int d = 0; d &lt; 4; d++) {
+                    if (d != enteredSide &amp;&amp; hasDirection(mask, d)) {
+                        nextDirection = d;
+                        break;
+                    }
+                }
+            }
+
+            if (nextDirection == -1) {
+                return false;
+            }
+
+            r += DR[nextDirection];
+            c += DC[nextDirection];
+            direction = nextDirection;
+        }
+
+        // 놓인 모든 선로를 지나갔는지 확인한다.
+        for (int i = 0; i &lt; n; i++) {
+            for (int j = 0; j &lt; m; j++) {
+                if (board[i][j] &gt; 0 &amp;&amp; !visitedCell[i][j]) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private boolean hasDirection(int mask, int direction) {
+        int directionBit = 1 &lt;&lt; direction;
+        return (mask &amp; directionBit) != 0;
+    }
+
+    private boolean isInside(int r, int c) {
+        return 0 &lt;= r &amp;&amp; r &lt; n &amp;&amp; 0 &lt;= c &amp;&amp; c &lt; m;
+    }
+}</code></pre></div>
+      </section>
+
+      <section id="summary-last">
+        <h2>10. 최종 정리</h2>
+        <div class="flow"><span>빈칸마다 8가지 선택</span><b>→</b><span>연결 불가 즉시 제거</span><b>→</b><span>완성 후 기차 이동</span><b>→</b><span>정답 개수 증가</span></div>
+        <ol><li>선로는 네 방향의 연결 정보를 가진 비트마스크로 표현합니다.</li><li><code>dfs()</code>가 모든 가능한 선로 배치를 만듭니다.</li><li><code>canPlace()</code>가 잘못된 연결을 조기에 제거합니다.</li><li><code>canTravelAllTracks()</code>가 목적지 도착과 전체 선로 방문을 확인합니다.</li></ol>
+        <div class="callout good"><strong>발표할 때 기억할 한 문장</strong>“백트래킹으로 선로를 놓고, 연결이 틀린 경우는 즉시 버린 뒤, 완성된 선로에서 기차를 직접 움직입니다.”</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>기차 선로 · Java 백트래킹 풀이 노트</footer>
+
+  <script>
+    document.querySelectorAll('.copy').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const code = button.closest('.code-wrap').querySelector('code').innerText;
+        try {
+          await navigator.clipboard.writeText(code);
+          const original = button.textContent;
+          button.textContent = '복사됨';
+          setTimeout(() => button.textContent = original, 1200);
+        } catch (error) {
+          button.textContent = '복사 실패';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
