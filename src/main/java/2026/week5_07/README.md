@@ -359,3 +359,174 @@ private int lcm(int a, int b) {
 - `L`: 모든 신호등 주기의 최소공배수
 - 시간 복잡도: `O(n × L)`
 - 공간 복잡도: `O(1)`
+
+---
+
+# 키패드 누르기
+
+- 문제 번호: 67256
+- 난이도: Level 1
+- 풀이 날짜: 2026-07-30
+- 핵심 알고리즘: 시뮬레이션, 좌표 변환, 맨해튼 거리
+- 문제 링크: https://school.programmers.co.kr/learn/courses/30/lessons/67256
+
+## 핵심 아이디어
+
+- `1, 4, 7`은 항상 왼손으로 누른다.
+- `3, 6, 9`는 항상 오른손으로 누른다.
+- `2, 5, 8, 0`은 목표 숫자와 양손 사이의 거리를 비교한다.
+- 거리가 같다면 주로 사용하는 손으로 누른다.
+- 숫자를 누를 때마다 사용한 손의 현재 위치를 갱신한다.
+
+키패드 입력을 순서대로 처리해야 하며, 이전에 누른 숫자에 따라 다음 거리가 달라진다. 따라서 왼손과 오른손의 현재 위치를 각각 저장하면서 시뮬레이션한다.
+
+## 키패드를 숫자로 표현하기
+
+키패드의 마지막 줄까지 좌표 공식으로 처리하기 위해 `*`, `0`, `#`을 각각 `10`, `11`, `12`로 표현한다.
+
+```text
+1   2   3
+4   5   6
+7   8   9
+10  11  12
+ *   0   #
+```
+
+왼손과 오른손의 초기 위치는 다음과 같다.
+
+```java
+int left = 10;  // *
+int right = 12; // #
+```
+
+입력으로 `0`이 들어오면 좌표 계산을 위해 `11`로 바꾼다.
+
+```java
+int target = number == 0 ? 11 : number;
+```
+
+## 행과 열 구하기
+
+키패드는 한 행에 숫자가 3개씩 있다. 번호에서 `1`을 뺀 뒤 `3`으로 나눈 몫은 행, 나머지는 열이 된다.
+
+```java
+int row = (number - 1) / 3;
+int column = (number - 1) % 3;
+```
+
+예를 들어 숫자 `8`은 다음 좌표에 있다.
+
+```text
+row    = (8 - 1) / 3 = 2
+column = (8 - 1) % 3 = 1
+
+8의 좌표 = (2, 1)
+```
+
+## 거리 구하기
+
+키패드에서는 위, 아래, 왼쪽, 오른쪽으로 한 칸씩 이동한다. 따라서 행의 차이와 열의 차이를 더해 거리를 구한다.
+
+```java
+int distance =
+        Math.abs(currentRow - targetRow)
+                + Math.abs(currentColumn - targetColumn);
+```
+
+이 계산을 맨해튼 거리라고 한다.
+
+왼손과 오른손에서 목표 숫자까지의 거리를 각각 계산한다.
+
+```java
+int leftDistance =
+        Math.abs(leftRow - targetRow)
+                + Math.abs(leftColumn - targetColumn);
+
+int rightDistance =
+        Math.abs(rightRow - targetRow)
+                + Math.abs(rightColumn - targetColumn);
+```
+
+양손 사이의 거리를 구하는 것이 아니라, 각 손에서 목표 숫자까지의 거리를 구하는 것이 중요하다.
+
+## 사용할 손 결정하기
+
+왼손 거리가 더 짧으면 왼손을 사용한다.
+
+```java
+if (leftDistance < rightDistance) {
+    answer.append("L");
+    left = target;
+}
+```
+
+오른손 거리가 더 짧으면 오른손을 사용한다.
+
+```java
+else if (rightDistance < leftDistance) {
+    answer.append("R");
+    right = target;
+}
+```
+
+거리가 같다면 `hand`에 저장된 주 사용 손을 확인한다. Java 문자열은 `==`가 아니라 `equals()`로 비교한다.
+
+```java
+else if (hand.equals("right")) {
+    answer.append("R");
+    right = target;
+} else {
+    answer.append("L");
+    left = target;
+}
+```
+
+## `continue`를 사용하는 이유
+
+왼쪽이나 오른쪽 고정 숫자를 처리한 뒤에는 거리 계산을 할 필요가 없다.
+
+```java
+if (number == 1 || number == 4 || number == 7) {
+    answer.append("L");
+    left = target;
+    continue;
+}
+```
+
+`continue`는 현재 숫자의 처리를 끝내고 다음 숫자로 넘어간다. 거리 비교 부분은 반복문의 마지막이므로 별도의 `continue`가 필요하지 않다.
+
+## 전체 흐름
+
+```text
+왼손은 *, 오른손은 #에서 시작
+              ↓
+numbers의 숫자를 하나씩 확인
+              ↓
+왼쪽 숫자인가?
+ ├─ 예 → L 추가, 왼손 위치 갱신
+ └─ 아니요
+              ↓
+오른쪽 숫자인가?
+ ├─ 예 → R 추가, 오른손 위치 갱신
+ └─ 아니요
+              ↓
+양손에서 목표 숫자까지 거리 계산
+              ↓
+더 가까운 손 또는 주 사용 손 선택
+              ↓
+결과 추가 및 선택한 손 위치 갱신
+```
+
+## 주의할 점
+
+- `0`은 좌표를 계산할 때 `11`로 변환한다.
+- 손끼리의 거리가 아니라 각 손에서 목표 숫자까지의 거리를 구한다.
+- 숫자를 누른 뒤에는 반드시 사용한 손의 위치를 갱신한다.
+- 문자열 비교는 `hand == "right"`가 아니라 `hand.equals("right")`를 사용한다.
+- 결과 문자를 반복해서 추가하므로 `StringBuilder`를 사용한다.
+
+## 복잡도
+
+- `n`: 눌러야 하는 숫자의 개수
+- 시간 복잡도: `O(n)`
+- 공간 복잡도: `O(n)` — 결과 문자열
