@@ -547,3 +547,195 @@ class PG_42627 {
     }
 }
 ```
+
+---
+
+# 주식가격
+
+- 문제 번호: 42584
+- 난이도: Level 2
+- 풀이 날짜: 2026-08-20
+- 핵심 자료구조: 스택(`ArrayDeque`)
+- 핵심 알고리즘: 단조 스택
+- 문제 링크: https://school.programmers.co.kr/learn/courses/30/lessons/42584
+
+## 문제 설명
+
+초 단위로 기록된 주식 가격이 주어질 때, 각 시점의 가격이 떨어지지 않은 기간이 몇 초인지 구한다. 가격이 떨어진 순간까지도 기간에 포함한다.
+
+```text
+prices = [1, 2, 3, 2, 3]
+answer = [4, 3, 1, 1, 0]
+```
+
+인덱스 `2`의 가격은 `3`이고 다음 시점의 가격은 `2`이므로 1초 뒤 가격이 떨어진다.
+
+## 핵심 아이디어
+
+스택에는 가격 자체가 아니라 아직 가격이 떨어진 시점을 만나지 못한 가격의 인덱스를 저장한다.
+
+```java
+Deque<Integer> stack = new ArrayDeque<>();
+```
+
+인덱스를 저장하면 이전 가격과 유지 시간을 모두 구할 수 있다.
+
+```text
+이전 가격 = prices[이전 인덱스]
+유지 시간 = 현재 인덱스 - 이전 인덱스
+```
+
+## 현재 가격과 이전 가격 비교
+
+현재 가격이 스택 맨 위 인덱스의 가격보다 낮으면 이전 가격이 현재 시점에 떨어진 것이다.
+
+```java
+while (!stack.isEmpty() && prices[stack.peek()] > prices[i]) {
+    int previousIndex = stack.pop();
+    answer[previousIndex] = i - previousIndex;
+}
+```
+
+예를 들어 현재 인덱스가 `3`이고 다음 상태라면:
+
+```text
+prices[2] = 3
+prices[3] = 2
+
+3 > 2 → 인덱스 2의 가격이 현재 시점에 하락
+유지 시간 = 3 - 2 = 1초
+```
+
+가격이 떨어진 인덱스는 정답을 계산한 뒤 스택에서 제거한다.
+
+## `if`가 아니라 `while`을 사용하는 이유
+
+현재 가격 하나로 스택에 있는 여러 이전 가격의 하락 시점이 결정될 수 있다. 따라서 스택 맨 위의 가격이 현재 가격보다 높은 동안 반복해서 처리한다.
+
+```text
+이전 가격들: 5, 4, 3
+현재 가격: 1
+
+3 > 1 → 처리
+4 > 1 → 처리
+5 > 1 → 처리
+```
+
+비교가 끝나면 현재 인덱스도 이후 가격과 비교하기 위해 스택에 저장한다.
+
+```java
+stack.push(i);
+```
+
+## 끝까지 가격이 떨어지지 않은 경우
+
+전체 가격을 확인한 뒤 스택에 남은 인덱스는 마지막 시점까지 가격이 떨어지지 않은 경우다.
+
+```java
+int lastIndex = prices.length - 1;
+
+while (!stack.isEmpty()) {
+    int previousIndex = stack.pop();
+    answer[previousIndex] = lastIndex - previousIndex;
+}
+```
+
+예를 들어 인덱스 `1`의 가격이 마지막 인덱스 `4`까지 떨어지지 않았다면 유지 시간은 다음과 같다.
+
+```text
+4 - 1 = 3초
+```
+
+마지막 가격은 이후 시간이 없으므로 결과가 자동으로 `0`이 된다.
+
+## 동작 예시
+
+```text
+가격: [1, 2, 3, 2, 3]
+시간:  0  1  2  3  4
+```
+
+```text
+0초: 인덱스 0 push
+1초: 가격이 떨어지지 않음 → 인덱스 1 push
+2초: 가격이 떨어지지 않음 → 인덱스 2 push
+3초: 가격 3 > 현재 가격 2
+     → 인덱스 2 pop
+     → answer[2] = 3 - 2 = 1
+     → 인덱스 3 push
+4초: 가격이 떨어지지 않음 → 인덱스 4 push
+```
+
+순회가 끝난 뒤 남은 인덱스는 마지막 시점까지의 시간을 계산한다.
+
+```text
+answer[0] = 4 - 0 = 4
+answer[1] = 4 - 1 = 3
+answer[3] = 4 - 3 = 1
+answer[4] = 4 - 4 = 0
+```
+
+최종 결과:
+
+```text
+[4, 3, 1, 1, 0]
+```
+
+## 전체 흐름
+
+```text
+모든 가격을 앞에서부터 확인
+             ↓
+스택의 이전 가격 > 현재 가격인가?
+ ├─ 예 → 이전 인덱스 pop
+ │       현재 인덱스 - 이전 인덱스 기록
+ │       다시 스택 맨 위와 비교
+ └─ 아니요
+             ↓
+현재 인덱스를 스택에 push
+             ↓
+전체 순회가 끝나면 남은 인덱스에
+마지막 시점까지의 기간 기록
+```
+
+## 복잡도
+
+각 인덱스는 스택에 한 번 들어가고 최대 한 번 나온다. 내부에 `while`문이 있지만 전체 push와 pop 횟수는 각각 최대 `n`번이다.
+
+- 시간 복잡도: `O(n)`
+- 공간 복잡도: `O(n)`
+
+## 전체 코드
+
+```java
+import java.util.ArrayDeque;
+import java.util.Deque;
+
+class PG_42584 {
+    public int[] solution(int[] prices) {
+        int[] answer = new int[prices.length];
+
+        Deque<Integer> stack = new ArrayDeque<>();
+
+        for (int i = 0; i < prices.length; i++) {
+            while (!stack.isEmpty() && prices[stack.peek()] > prices[i]) {
+                int previousIndex = stack.pop();
+
+                answer[previousIndex] = i - previousIndex;
+            }
+
+            stack.push(i);
+        }
+
+        int lastIndex = prices.length - 1;
+
+        while (!stack.isEmpty()) {
+            int previousIndex = stack.pop();
+
+            answer[previousIndex] = lastIndex - previousIndex;
+        }
+
+        return answer;
+    }
+}
+```
